@@ -33,6 +33,11 @@ The path is the part of a request URL after the hostname and port number, so in 
 https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods
 
 Express uses app.get() to register routes to match GET requests. Express routes (including app.get()) **usually take two arguments**, a **path (usually a string)**, and a **callback function to handle the request and send a response**.
+```JS
+app.get('/expressions', (req, res, next) => {
+  console.log('Callback function!')
+});
+```
 
 ### Static Files
 **Serving static files in Express**
@@ -47,3 +52,20 @@ The root argument specifies the root directory from which to serve static assets
 app.use(express.static('public'))
 ```
 Note: There should be a "public" folder in your applications root folder. There you can put the static files.
+
+
+### Sending A Response
+HTTP follows a one request-one response cycle. Each client expects exactly **one response per request**, and each server should only send a single response back to the client per request.
+
+Express servers send responses using the **.send() method** on the response object. **.send() will take any input and include it in the response body**.
+
+In addition to .send(), **.json()** can be used to **explicitly send JSON-formatted responses**. .json() sends any JavaScript object passed into it.
+
+```js
+const monsters = [{ type: 'werewolf' }, { type: 'hydra' }, { type: 'chupacabra' }];
+app.get('/monsters', (req, res, next) => {
+  res.send(monsters);
+});
+```
+
+### Matching Route Paths
