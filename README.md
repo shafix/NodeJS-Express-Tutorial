@@ -89,3 +89,22 @@ app.get('/monsters/:name', (req, res, next) => {
 ```
 Explanation:
 In this code snippet, a .get() route is defined to match **/monsters/:name path**. When a GET request arrives for **/monsters/hydra**, the callback is called. Inside the callback, **req.params** is **an object with the key name and the value hydra**, which was present in the actual request path. The appropriate monster is retrieved by its name from the monsters object and sent back the the client.
+
+### Status Codes
+Express allows us to set the status code on responses before they are sent. Response codes provide information to clients about how their requests were handled.
+
+The **res** object has a **.status()** method to allow us to set the status code, and other methods like **.send()** can be chained from it.
+```js
+const monsterStoreInventory = { fenrirs: 4, banshees: 1, jerseyDevils: 4, krakens: 3 };
+app.get('/monsters-inventory/:name', (req, res, next) => {
+  const monsterInventory = monsterStoreInventory[req.params.name];
+  if (monsterInventory) {
+    res.send(monsterInventory);
+  } else {
+    res.status(404).send('Monster not found');
+  }
+});
+```
+
+### Longer Route Paths
+
