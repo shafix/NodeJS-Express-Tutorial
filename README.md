@@ -69,3 +69,4 @@ app.get('/monsters', (req, res, next) => {
 ```
 
 ### Matching Route Paths
+![Route Matching](https://github.com/shafix/NodeJS-Express-Tutorial/blob/master/Route%20matching.PNG)
