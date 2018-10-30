@@ -130,3 +130,19 @@ app.put('/monsters/:id', (req, res, next) => {
 ```
 Here, we have a **route for updating monsters by ID**. When **a PUT /monsters/1?name=chimera&age=1 request** arrives, our callback function is called and, we **create a monsterUpdates variable to store req.query**. Since **req.params.id is '1'**, we **replace monsters['1']'s value with monsterUpdates** . Finally, Express **sends back the new monsters['1']**.
 
+### Longer Route Paths
+![HTTP verb matching](https://github.com/shafix/NodeJS-Express-Tutorial/blob/master/Matching%20by%20HTTP%20verb.PNG)
+Express matches routes using both path and HTTP method verb.
+
+### POST requests
+**POST** is the HTTP method verb used for creating new resources. 
+Because POST routes create new data, their **paths do not end with a route parameter**, but instead **end with the type of resource to be created**.
+For example, to create a new monster, a client would make a **POST request to /monsters**. The client does not know the id of the monster until it is created and sent back by the server, therefore **POST /monsters/:id doesn't make sense** because a client couldn't know the unique id of a monster before it exists.
+Express uses **.post()** as its method for POST requests. 
+The HTTP status code for a newly-created resource is **201 Created**.
+
+### DELETE requests
+**DELETE** is the HTTP method verb used to delete resources.
+Because DELETE routes delete currently existing data, **their paths should usually end with a route parameter** to indicate **which resource to delete**.
+Express uses **.delete()** as its method for DELETE requests.
+Servers often send a **204 No Content** status code if deletion occurs without error.
