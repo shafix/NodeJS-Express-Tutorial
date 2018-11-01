@@ -205,3 +205,7 @@ const app = express();
 const monstersRouter = require('./monsters.js');
 app.use('/monsters', monstersRouter);
 ```
+
+### Matching in nested routers
+![Route Matching 2](https://github.com/shafix/NodeJS-Express-Tutorial/blob/master/Matching%20In%20Nested%20Routers.PNG)
+Routers can be nested as many times as necessary for an application, so understanding nested route matching is important for created complicated APIs.
