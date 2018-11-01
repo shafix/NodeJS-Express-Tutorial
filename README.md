@@ -146,3 +146,62 @@ The HTTP status code for a newly-created resource is **201 Created**.
 Because DELETE routes delete currently existing data, **their paths should usually end with a route parameter** to indicate **which resource to delete**.
 Express uses **.delete()** as its method for DELETE requests.
 Servers often send a **204 No Content** status code if deletion occurs without error.
+
+# Using routers
+### Using routers can help your application be more module and less cumbersome.
+An **Express router** provides a subset of Express methods. To create an instance of one, we **invoke the .Router() method** on the **top-level Express import**.
+To use a router, we **mount it** at a certain path using **app.use()** and **pass in the router as the second argument**. This router will now be used for all paths that begin with that path segment. To create a router to handle all requests beginning with /monsters, the code would look like this:
+```js
+const express = require('express');
+const app = express();
+
+const monsters = {
+  '1': {  name: 'godzilla', age: 250000000 },
+  '2': {  Name: 'manticore', age: 21  }
+}
+
+const monstersRouter = express.Router();
+
+app.use('/monsters', monstersRouter);
+
+monstersRouter.get('/:id', (req, res, next) => {
+  const monster = monsters[req.params.id];
+  If (monster) { res.send(monster); } 
+  else { res.status(404).send();
+  }
+});
+```
+Inside the **monstersRouter**, all matching routes are assumed to have **/monsters** prepended, as it is **mounted** at that path. **monstersRouter.get('/:id')** matches the full path **/monsters/:id**.
+When a **GET /monsters/1** request arrives, Express **matches /monsters in app.use()** because the beginning of the path ('/monsters') matches. Express' route-matching algorithm enters the monstersRouter's routes to search for full path matches. Since **monstersRouter.get('/:id)** is **mounted at /monsters**, **the two paths together match the entire request path (/monsters/1)**, so the route matches and the callback is invoked. The 'godzilla' monster is fetched from the monsters array and sent back.
+
+### Using Multiple Router Files
+Generally, we will keep each router in its own file, and require them in the main application. This allows us to keep our code clean and our files short.
+```js
+// monsters.js
+const express = require('express');
+const monstersRouter = express.Router();
+
+const monsters = {
+  '1': { name: 'godzilla', age: 250000000 },
+  '2': {  Name: 'manticore', age: 21  }
+}
+
+monstersRouter.get('/:id', (req, res, next) => {
+  const monster = monsters[req.params.id];
+  if (monster) { res.send(monster); } 
+  else { res.status(404).send();
+  }
+});
+
+module.exports = monstersRouter;
+```
+This code contains all the monsters specific code. In a more full-fledged API, this file would contain multiple routes. To use this router in another file, we use **module.exports** so that **other files can access monstersRouter**. The only other new line of code required is that Express must be required in each file, since we'll need to create a router with express.Router().
+
+Our main.js file could then be refactored to import the monstersRouter:
+```js
+// main.js
+const express = require('express');
+const app = express();
+const monstersRouter = require('./monsters.js');
+app.use('/monsters', monstersRouter);
+```
