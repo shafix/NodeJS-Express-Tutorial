@@ -140,12 +140,31 @@ Because POST routes create new data, their **paths do not end with a route param
 For example, to create a new monster, a client would make a **POST request to /monsters**. The client does not know the id of the monster until it is created and sent back by the server, therefore **POST /monsters/:id doesn't make sense** because a client couldn't know the unique id of a monster before it exists.
 Express uses **.post()** as its method for POST requests. 
 The HTTP status code for a newly-created resource is **201 Created**.
+```js
+app.post('/expressions', (req, res, next) => {
+  newExpression = createElement('expressions',req.query);
+  if (newExpression != false)
+    {expressions.push(newExpression);
+     res.status(201).send(newExpression); }
+  else { res.status(400).send(); }
+});
+```
 
 ### DELETE requests
 **DELETE** is the HTTP method verb used to delete resources.
 Because DELETE routes delete currently existing data, **their paths should usually end with a route parameter** to indicate **which resource to delete**.
 Express uses **.delete()** as its method for DELETE requests.
 Servers often send a **204 No Content** status code if deletion occurs without error.
+```js
+app.delete('/expressions/:id', (req, res, next) => {
+  const expressionIndex = getIndexById(req.params.id, expressions);
+  if (expressionIndex !== -1) {
+    deletedElement = expressions.splice(expressionIndex,1);
+    res.status(204).send(req.params.id); } 
+  else { res.status(404).send(); }
+});
+```
+
 
 # Using routers
 ### Using routers can help your application be more module and less cumbersome.
