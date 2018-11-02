@@ -228,3 +228,91 @@ app.use('/monsters', monstersRouter);
 ### Matching in nested routers
 ![Route Matching 2](https://github.com/shafix/NodeJS-Express-Tutorial/blob/master/Matching%20In%20Nested%20Routers.PNG)
 Routers can be nested as many times as necessary for an application, so understanding nested route matching is important for created complicated APIs.
+
+
+
+
+# Extra : DRY (Don't repeat yourself) code quality
+
+### DRYing Routes With app.use() - Middleware
+Middleware is code that executes between a server receiving a request and sending a response. It operates on the boundary, so to speak, between those two HTTP actions.
+In Express, middleware is a function. Middleware can **perform logic on the request and response objects**, such as: 
+inspecting a request, 
+performing some logic based on the request, 
+attaching information to the response, 
+attaching a status to the response, 
+sending the response back to the user, 
+or simply passing the request and response to another middleware. 
+Middleware can do any combination of those things or anything else a Javascript function can do.
+```js
+app.use((req, res, next) => {
+  console.log('Request received');
+});
+```
+The previous code snippet is an example of middleware in action. app.use() takes a callback function that it will call for every received request. In this example, every time the server receives a request, it will find the first registered middleware function and call it. In this case, the server will find the callback function specified above, call it, and print out 'Request received'.
+
+### Using next()
+We mentioned that most of Express's functionality is chaining middleware. This chain of middleware is referred to as the middleware stack.
+The middleware stack is processed in the order they appear in the application file, such that middleware defined later happens after middleware defined before.
+```js
+app.use((req, res, next) => {
+  console.log("A sorcerer approaches!");
+  next();
+});
+
+app.get('/magic/:spellname', (req, res, next) => {
+  console.log("The sorcerer is casting a spell!");
+  next();
+});
+
+app.get('/magic/:spellname', (req, res, next) => {
+  console.log(`The sorcerer has cast ${req.params.spellname}`);
+  res.status(200).send();
+});
+
+app.get('/magic/:spellname', (req, res, next) => {
+  console.log("The sorcerer is leaving!");
+});
+
+// Accessing http://localhost:4001/magic/fireball 
+// Console Output:
+// "A sorcerer approaches!"
+// "The sorcerer is casting a spell!"
+// "The sorcerer has cast fireball"
+```
+In the above code, **the routes are called in the order that they appear in the file**, provided the previous route called **next()** and thus **passed control to the next middleware**.
+An Express middleware is a function with **three parameters: (req, res, next)**. The sequence is expressed by a set of callback functions invoked progressively after each middleware performs its purpose. **The third argument to a middleware function, next, should get explicitly called as the last part of the middleware's body**. This **will hand off the processing of the request and the construction of the response to the next middleware in the stack**.
+
+### Routes as middleware
+Express routes are middleware. Every route created in Express is also a middleware function handling the request and response objects at that part of the stack.
+
+## Route-Level app.use() - Single Path
+This is the app.use() function signature: 
+```js
+app.use([path,] callback [, callback...])
+```
+**app.use()** takes an **optional path parameter** as its first argument. We can now write middleware that will run for every request at a specific path.
+```js
+app.use('/sorcerer', (req, res, next) => {
+  console.log('User has hit endpoint /sorcerer');
+  next();
+});
+```
+In the example above the console will print 'User has hit endpoint /sorcerer', if someone visits our web page's '/sorcerer' endpoint. Since the method app.use() was used, it won't matter if the user is performing a GET,a POST, or any other kind of HTTP request. 
+
+The request **req** and response **res** objects are passed forward when using **next()**.
+
+
+### Control Flow With next()
+We don't always want to pass control to the next middleware in the stack.
+For example, when designing a system with confidential information, we want to be able to selectively show that information to authorized users.
+We would create middleware that tests a user's permissions. If the user has the permission necessary, we would continue through the middleware stack by calling next(). If it fails, we would want to let the user know that they're not allowed to see the information they're trying to access.
+
+## Route-Level app.use() - Multiple Path
+The **PATH argument** of **app.use()**:
+The path for which the middleware function is invoked; can be any of:
+-A string representing a path.
+-A path pattern.
+-A regular expression pattern to match paths.
+-**An array of (paths)** combinations of any of the above. 
+
