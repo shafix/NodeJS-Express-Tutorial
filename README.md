@@ -380,3 +380,29 @@ Options and other documentation: https://github.com/expressjs/morgan
 ## Open-Source Middleware: Parsing the body with "bodyParser"
 Node.js body parsing middleware.
 Parse incoming request bodies in a middleware before your handlers, available under the req.body property.
+
+## Error handling middleware
+Error handling middleware needs to be the last app.use() in your file. If an error happens in any of our routes, we want to make sure it gets passed to our error handler. The middleware stack progresses through routes as they are presented in a file, therefore the error handler should sit at the bottom of the file. 
+```js
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
+```
+If we anticipate an operation might fail, we can invoke our error-handling middleware. We do this by passing an error object as an argument to next().
+```js
+app.use((req, res, next) => {
+  const newValue = possiblyProblematicOperation();
+  if (newValue === undefined) {
+    let undefinedError = new Error('newValue was not defined!');
+    return next(undefinedError);
+  }
+  next();
+});
+
+app.use((err, req, res, next) => {
+  const status = err.status || 500;
+  res.status(status).send(err.message);
+});
+
+```
