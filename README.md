@@ -316,3 +316,67 @@ The path for which the middleware function is invoked; can be any of:
 -A regular expression pattern to match paths.
 -**An array of (paths)** combinations of any of the above. 
 
+```js
+app.use(['/beans/', '/beans/:beanName'], (req, res, next) => {      //Used for two paths
+  let bodyData = '';
+  req.on('data', (data) => { bodyData += data; }); //The body of the request has been received
+  req.on('end', () => {       //Full request has been received
+    if (bodyData) { req.body = JSON.parse(bodyData); }
+    next();
+  });
+});
+```
+
+### Using named functions for the Middleware Stacks
+```js
+const logging = (req, res, next) => {
+  console.log(req);
+  next();
+};
+
+app.use(logging);
+```
+
+### Multiple callbacks as additional parameters for GET POST PUT..
+```js
+const authenticate = (req, res, next) => {
+  ...
+};
+
+const validateData = (req, res, next) => {
+  ...
+};
+
+const getSpell = (req, res, next) => {
+  res.status(200).send(getSpellById(req.params.id));
+};
+
+const createSpell = (req, res, next) => {
+  createSpellFromRequest(req);
+  res.status(201).send();
+};
+
+const updateSpell = (req, res, next) => {
+  updateSpellFromRequest(req);
+  res.status(204).send();
+}
+
+app.get('/spells/:id', authenticate, getSpell);
+
+app.post('/spells', authenticate, validateData, createSpell);
+
+app.put('/spells/:id', authenticate, validateData, updateSpell);
+```
+In the above code sample, we created **reusable middleware** for authentication and data validation. We use the authenticate() middleware to verify a user is logged in before proceeding with the request and we use the validateData() middleware before performing the appropriate create or update function. **Additional middleware can be placed at any point in this chain**.
+
+## Open-Source Middleware: Logging with "Morgan"
+Morgan - an open-source library for logging information about the HTTP request-response cycle in a server application.
+
+**morgan()** is a function that **will return a middleware function**, to reiterate: the **return value of morgan() will be a function**, that function will have the **function signature (req, res, next)** that **can be inserted into an app.use()**, and that function will be called before all following middleware functions.
+
+Morgan takes an argument to describe the formatting of the logging output. We will be using **morgan('tiny')**.
+Options and other documentation: https://github.com/expressjs/morgan
+
+## Open-Source Middleware: Parsing the body with "bodyParser"
+Node.js body parsing middleware.
+Parse incoming request bodies in a middleware before your handlers, available under the req.body property.
