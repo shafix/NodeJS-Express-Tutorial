@@ -1,6 +1,11 @@
 # NodeJS-Express-Tutorial
 https://www.codecademy.com/learn/learn-express
 
+# Other useful links
+https://nodejs.org/en/docs/guides/anatomy-of-an-http-transaction/
+
+# ---
+
 ### CRUD
 Create, Read, Update, and Delete
 
