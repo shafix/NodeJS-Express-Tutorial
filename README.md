@@ -3,8 +3,21 @@ https://www.codecademy.com/learn/learn-express
 
 # Other useful links
 https://nodejs.org/en/docs/guides/anatomy-of-an-http-transaction/
-
-# ---
+About requests:
+- URL 
+- Method/verb
+- Header
+- Body
+- Errors
+About responses:
+- Status codes
+- Response headers
+- Response body
+- Response errors
+Other: 
+- Some good examples
+- Piping
+# 
 
 ### CRUD
 Create, Read, Update, and Delete
