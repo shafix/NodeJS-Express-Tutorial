@@ -387,8 +387,7 @@ app.put('/spells/:id', authenticate, validateData, updateSpell);
 ```
 In the above code sample, we created **reusable middleware** for authentication and data validation. We use the authenticate() middleware to verify a user is logged in before proceeding with the request and we use the validateData() middleware before performing the appropriate create or update function. **Additional middleware can be placed at any point in this chain**.
 
-### Middleware
-## Middleware resources https://expressjs.com/en/resources/middleware.html
+## Express Middleware resources https://expressjs.com/en/resources/middleware.html
 
 ## Open-Source Middleware: Logging with "Morgan"
 Morgan - an open-source library for logging information about the HTTP request-response cycle in a server application.
