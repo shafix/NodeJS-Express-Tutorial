@@ -437,6 +437,35 @@ app.param('spellId', (req, res, next, id) => {
   });
 });
 ```
-In the code above we intercept any request to a route handler with the :spellId parameter. Note that in the app.param function signature, 'spellId' does not have the leading :. The actual ID will be passed in as the fourth argument, id in this case, to the app.param callback function when a request arrives.
-We look up the spell in our SpellBook array using the .find() method. If SpellBook does not exist, or some other error is thrown in this process, we pass the error to the following middleware (hopefully we've written some error-handling middleware, or included some externally-sourced error-handling middleware). If the spell exists in SpellBook, we attach it as a property of the request object (so future routes can reference it via req.spell). If the requested spell does not exist, we let future middleware know there was an error with the request by creating a new Error object and passing it to next().
+In the code above we **intercept any request to a route handler with the :spellId parameter**. Note that in the app.param function signature, **'spellId' does not have the leading :**. The actual ID will be passed in as **the fourth argument, id in this case**, to the **app.param callback function** when a request arrives.
+We look up the spell in our SpellBook array using the .find() method. If SpellBook does not exist, or some other error is thrown in this process, we pass the error to the following middleware (hopefully we've written some error-handling middleware, or included some externally-sourced error-handling middleware). If the spell exists in SpellBook, we **attach it as a property of the request object** (so future routes can reference it via **req.spell**). If the requested spell does not exist, we let future middleware know there was an error with the request by creating a new Error object and passing it to next().
 Note that inside an app.param callback, you should use the fourth argument as the parameter's value, not a key from the req.params object.
+
+## Merge parameters - nested routers
+When we're building web endpoints, we might want to access some property of a complex object. In order to do this in Express, we can **design a nested router**. This would be a router that is **invoked within another router**. In order to **pass parameters the parent router has access to**, we pass a special configuration object when defining the router.
+```js
+const sorcererRouter = express.Router();
+const familiarRouter = express.Router({mergeParams: true});
+
+sorcererRouter.use('/:sorcererId/familiars', familiarRouter);
+
+sorcererRouter.get('/', (req, res, next) => {
+  res.status(200).send(Sorcerers);
+  next();
+});
+
+sorcererRouter.param('sorcererId', (req, res, next, id) => {
+  const sorcerer = getSorcererById(id);   
+  req.sorcerer = sorcerer;
+  next();
+});
+
+familiarRouter.get('/', (req, res, next) => {
+  res.status(200).send(`Sorcerer ${req.sorcerer} has familiars ${getFamiliars(sorcerer)}`);
+});
+
+app.use('/sorcerer', sorcererRouter);
+```
+In the code above we define two endpoints: **/sorcerer** and **/sorcerer/:sorcererId/familiars**. The **familiars are nested into the sorcerer endpoint** — indicating the relationship that a sorcerer has multiple familiars. Take careful note of the {mergeParameters: true} argument that gets passed when creating the familiarRouter. This argument tells Express that the familiarRouter should have access to parents passed into its parent router, that is, the sorcererRouter. We then tell express that the path for the familiarRouter is the same as the path for the sorcererRouter with the additional path /:sorcererId/familiars. We then can create a family of routes (a router) built by appending routes to familiarRouter's base: /sorcerer/:sorcererId/familiars.
+
+
