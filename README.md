@@ -424,3 +424,19 @@ app.use((err, req, res, next) => {
 });
 
 ```
+
+# Router Parameters
+### router.param()
+When a specific parameter is present in a route, we can write a function that will perform the necessary lookup and attach it to the req object in subsequent middleware that is run.
+```js
+app.param('spellId', (req, res, next, id) => {
+  SpellBook.find(id, (err, spell) => {
+    if (err) { next(err); } 
+    else if (spell) { req.spell = spell; next(); } 
+    else { next(new Error('Your magic spell was not found in any of our tomes')); }
+  });
+});
+```
+In the code above we intercept any request to a route handler with the :spellId parameter. Note that in the app.param function signature, 'spellId' does not have the leading :. The actual ID will be passed in as the fourth argument, id in this case, to the app.param callback function when a request arrives.
+We look up the spell in our SpellBook array using the .find() method. If SpellBook does not exist, or some other error is thrown in this process, we pass the error to the following middleware (hopefully we've written some error-handling middleware, or included some externally-sourced error-handling middleware). If the spell exists in SpellBook, we attach it as a property of the request object (so future routes can reference it via req.spell). If the requested spell does not exist, we let future middleware know there was an error with the request by creating a new Error object and passing it to next().
+Note that inside an app.param callback, you should use the fourth argument as the parameter's value, not a key from the req.params object.
